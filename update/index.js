@@ -23,6 +23,17 @@ function update(state, commands){
         newState.splice(parseInt(toRemove[0]), parseInt(toRemove[1]), parseInt(toRemove[2]));
       }
       break;
+    case('merge'):
+      for(var x in commands[baseKey]){
+        newState[x] = commands[baseKey][x];
+      }
+      break; 
+    case('set'):
+      newState = {};
+      for(var x in commands[baseKey]){
+        newState[x] = commands[baseKey][x];
+      }
+      break;   
     default:
       break;
      
