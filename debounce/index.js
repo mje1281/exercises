@@ -1,7 +1,15 @@
-function debounce (action, wait, immediate){
+function debounce (action, wait){
     
-  var callAction = function(){setTimeout(action, wait)}
-  return callAction;]
-  
-}
+  var timeout;
+  return function() {
+    var later = function() {
+      timeout = null;
+      action.call();
+    };
+    
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    
+  }  
+};
 module.exports.debounce = debounce;
