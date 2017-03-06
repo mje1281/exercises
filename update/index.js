@@ -33,7 +33,10 @@ function update(state, commands){
       for(var x in commands[baseKey]){
         newState[x] = commands[baseKey][x];
       }
-      break;   
+      break;  
+    case('apply'):
+        newState = commands[baseKey](state)
+      break; 
     default:
       break;
      
