@@ -12,7 +12,11 @@ function update(state, commands){
         newState.push(commands[baseKey][i]);
       }
       break;
-    
+    case('unshift'):
+      for(var i = 0; i < commands[baseKey].length; i++){
+        newState.unshift(commands[baseKey][i]);
+      }
+      break;
     default:
       break;
      
