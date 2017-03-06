@@ -17,6 +17,12 @@ function update(state, commands){
         newState.unshift(commands[baseKey][i]);
       }
       break;
+    case('splice'):
+      for(var i = 0; i < commands[baseKey].length; i++){
+        var toRemove = commands[baseKey][i];    
+        newState.splice(parseInt(toRemove[0]), parseInt(toRemove[1]), parseInt(toRemove[2]));
+      }
+      break;
     default:
       break;
      
