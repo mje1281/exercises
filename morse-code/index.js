@@ -1,17 +1,30 @@
 function transmitter(options, callback){
-  var dot = 1;
-  var dash = 3;
-  var spaceWithinLetter = 1;
-  var spaceBetweenLetter = 3;
-  var spaceBetweenWord = 7;
   
   var codes = options.codes;
   var message = options.message;
+  var toggle = options.toggle;
+  var timeouter = options.timeouter;
   
   var symbols = [];
   for (var i = 0; i < message.length; i++){
     var code = (message[i] == ' ') ? 'space' : codes['message'[i]];
-    symbols.push(code);
+    if(code !== 'space'){
+      for(var j = 0; j < code.length; j++){
+        if(code[j] === '.'){
+          toggle();
+          timeouter(toggle(), 1)
+          timeouter(toggle(), 1)
+        } else if(code[j] === '-'){
+          toggle();
+          timeouter(toggle(), 3);
+          timeouter(toggle(), 1);
+          clearTimeout(timeouter);
+        }
+      }
+    } else {
+      options.timeouter(options.toggle(), 7)
+    }
   }
+  callback();
 }
 module.exports.transmitter = transmitter;
