@@ -1,7 +1,9 @@
-function update(state, commands){  
+function update(stateToChange, commands){  
   
-  var newState = state;
+  var newState = stateToChange;
   var objectKeys = [];
+  var commandObject = {'$push':'push', '$unshift':'unshift', '$merge': 'merge', '$apply':'apply', '$splice':'splice', '$set': 'set'};
+
   getSubmissionKeys(commands);
   function getSubmissionKeys(submission){
     var originalKeys = Object.keys(submission)
@@ -13,50 +15,79 @@ function update(state, commands){
   
   var hasOwnProperty  = Object.prototype.hasOwnProperty;
   var directive = objectKeys[objectKeys.length - 1];
-  checkObject(commands, objectKeys, newState, 0);
-  
-  function checkObject(submission, keys, newObject, interval){  
+  return updateObject(commands, newState);
+
+  function updateObject(submission, newObject){  
     if(!Array.isArray(submission[directive])){
-      if(hasOwnProperty.call(submission, directive)){
-        change = submission[directive]
-        applyDirective(directive, submission, change, newObject)
-      } else {
-          checkObject(submission[keys[interval++]], keys, newObject[keys[interval++]], interval++);    
+      var changeObject = newObject
+      objectKeys = []
+      getSubmissionKeys(submission);
+      for(var i = 0; i < objectKeys.length; i++){
+        var key = objectKeys[i];
+        if(hasOwnProperty.call(commandObject, key)){          
+          changeObject = applyDirective(key, submission[key], newObject)
+        } else {
+          var newValue = updateObject(submission[key], newObject[key]) 
+          if (newValue !== changeObject[key]) {
+            if (changeObject === newObject){
+              changeObject = copy(newObject);
+            }
+            changeObject[key] = newValue;
+          }
+        }
       }
+
+      return changeObject;
+        
       
     } else {
       var change = commands[directive][0]
-      applyDirective(directive, submission, change, newState)
+      newObject = applyDirective(directive, change, newState)
     }
+    return newObject;
   }
   
-  function applyDirective(directive, commands, change, object){
+  
+  function applyDirective(directive, change, object){
     switch(directive){
       case('$push'):
           object.push(change)
+          return object;
         break;
       case('$unshift'):
-          object.unshift(change);
+          object.unshift(change)
+          return object;
         break;
       case('$splice'):   
           object.splice(parseInt(change[0]), parseInt(change[1]), parseInt(change[2]));
+          return object;
         break;
       case('$merge'):
         object = Object.assign(object, change);
+        return object;
         break;
       case('$set'):
-      console.log(object)
         object = change;
-        newState = change;
+        return object;
         break;
       case('$apply'):
-        newState = change(state)
+        object = change(newState)
+        return object;
         break;
       default:
         break;   
     }
   } 
   
-  return newState;
+  function copy(object) {
+  if (object instanceof Array) {
+    return object.slice();
+  } else if (object && typeof object === 'object') {
+    return Object.assign(new object.constructor(), object);
+  } else {
+    return object;
+  }
+}
+    
 };
 module.exports.update = update;
